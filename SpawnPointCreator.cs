@@ -10,11 +10,12 @@ using Random = UnityEngine.Random;
 using SpawnPoint = ArithFeather.AriToolKit.PointEditor.Point;
 
 namespace ArithFeather.CustomPlayerSpawning {
-	internal static class DefaultSpawnEditor {
-		private const string PlayerFixedPointFileName = "RandomPlayerSpawnData";
+	internal static class SpawnPointCreator {
+		private const string PlayerFixedPointFileName = "CustomPlayerSpawns";
 		private static readonly string PointDataFilePath = Path.Combine(PointIO.FolderPath, PlayerFixedPointFileName) + ".txt";
 
-		private static readonly Dictionary<RoleType, List<GameObject>> RoleOrganizedSpawnPoints = new Dictionary<RoleType, List<GameObject>>();
+		private static readonly Dictionary<RoleType, List<GameObject>> RoleGameObject_Dictionary = new Dictionary<RoleType, List<GameObject>>();
+		private static readonly Dictionary<RoleType, List<FixedPoint>> RoleSpawnPoint_Dictionary = new Dictionary<RoleType, List<FixedPoint>>();
 
 		private static bool _spawnFileExists;
 		private static PointList _pointList;
@@ -24,14 +25,10 @@ namespace ArithFeather.CustomPlayerSpawning {
 			_spawnFileExists = FileManager.FileExists(PointDataFilePath);
 		}
 
-		public static void CheckFile() {
+		public static void OrganizeSpawns(int seed) {
 			if (!_spawnFileExists) CreateDefaultSpawnPointFile();
-		}
 
-		public static void CreateNewSpawns() {
-			CheckFile();
-
-			RoleOrganizedSpawnPoints.Clear();
+			RoleGameObject_Dictionary.Clear();
 
 			var groupedSpawns = _pointList.IdGroupedFixedPoints;
 
@@ -60,34 +57,12 @@ namespace ArithFeather.CustomPlayerSpawning {
 					objects.Add(go);
 				}
 
-				if (RoleOrganizedSpawnPoints.ContainsKey(roleType)) {
-					// Replace data if key exists, allows for default game logic or new spawn point lookups.
-					RoleOrganizedSpawnPoints[roleType] = objects;
-				} else {
-					RoleOrganizedSpawnPoints.Add(roleType, objects);
-
-					// Try to add default game data.
-					switch (roleType) {
-						case RoleType.Scp93953:
-							TryRegisterRole(RoleType.Scp93989);
-							break;
-						case RoleType.NtfCadet:
-							TryRegisterRole(RoleType.NtfScientist);
-							TryRegisterRole(RoleType.NtfLieutenant);
-							TryRegisterRole(RoleType.NtfCommander);
-							break;
-					}
-
-
-					void TryRegisterRole(RoleType role) {
-						if (!RoleOrganizedSpawnPoints.ContainsKey(role))
-							RoleOrganizedSpawnPoints.Add(role, objects);
-					}
-				}
+				RoleGameObject_Dictionary.Add(roleType, objects);
+				RoleSpawnPoint_Dictionary.Add(roleType, spawns);
 			}
 		}
 
-		public static void CreateDefaultSpawnPointFile() {
+		private static void CreateDefaultSpawnPointFile() {
 			var roleSize = Enum.GetNames(typeof(RoleType)).Length - 1;
 
 			for (int i = 0; i < roleSize; i++) {
@@ -109,6 +84,10 @@ namespace ArithFeather.CustomPlayerSpawning {
 						case RoleType.Scientist: return GameObject.FindGameObjectsWithTag("SP_RSC");
 						case RoleType.ClassD: return GameObject.FindGameObjectsWithTag("SP_CDP");
 						case RoleType.Tutorial: return new[] { GameObject.Find("TUT Spawn") };
+						case RoleType.NtfScientist: return GameObject.FindGameObjectsWithTag("SP_MTF");
+						case RoleType.NtfLieutenant: return GameObject.FindGameObjectsWithTag("SP_MTF");
+						case RoleType.NtfCommander: return GameObject.FindGameObjectsWithTag("SP_MTF");
+						case RoleType.Scp93989: return GameObject.FindGameObjectsWithTag("SCP_939");
 						default: return null;
 					}
 				}
@@ -136,10 +115,11 @@ namespace ArithFeather.CustomPlayerSpawning {
 
 			PointIO.Save(_pointList, PointDataFilePath);
 			_pointList.FixData();
+			_spawnFileExists = true;
 		}
 
 		public static GameObject GetRandomSpawnPoint(RoleType role) {
-			var objects = RoleOrganizedSpawnPoints[role];
+			var objects = RoleGameObject_Dictionary[role];
 			return objects[Random.Range(0, objects.Count)];
 		}
 	}

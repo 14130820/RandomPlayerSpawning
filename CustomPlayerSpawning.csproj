@@ -76,13 +76,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GetRandomSpawnPointPatch.cs" />
+    <Compile Include="PlayerSpawningAPI.cs" />
     <Compile Include="RandomSpawnEventArgs.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Spawner.cs" />
     <Compile Include="PlayerSpawnPoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CustomPlayerSpawning.cs" />
-    <Compile Include="DefaultSpawnEditor.cs" />
+    <Compile Include="SpawnPointCreator.cs" />
     <Compile Include="SpawnPointRoom.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

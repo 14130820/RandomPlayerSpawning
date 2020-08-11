@@ -7,7 +7,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 
 		private static bool Prefix(ref GameObject __result, RoleType classID)
 		{
-			__result = DefaultSpawnEditor.GetRandomSpawnPoint(classID);
+			__result = SpawnPointCreator.GetRandomSpawnPoint(classID);
 			return false;
 		}
 	}

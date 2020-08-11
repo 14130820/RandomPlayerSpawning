@@ -4,27 +4,24 @@ using HarmonyLib;
 namespace ArithFeather.CustomPlayerSpawning {
 	public class CustomPlayerSpawning : Plugin<Config> {
 
-		//public Spawner Data = new Spawner();
-
 		public override string Author => "Arith";
 		public override System.Version Version => new System.Version("2.00");
 
 		private Harmony _harmony = new Harmony("RandomPlayerSpawning");
 
 		public override void OnEnabled() {
-			DefaultSpawnEditor.Reload();
 			base.OnEnabled();
+
+			SpawnPointCreator.Reload();
+
 			_harmony.PatchAll();
-			Exiled.Events.Handlers.Server.WaitingForPlayers += DefaultSpawnEditor.CreateNewSpawns;
-			Exiled.Events.Handlers.Server.ReloadedConfigs += DefaultSpawnEditor.Reload;
-			//Data.Enable();
+
+			AriToolKit.PointEditor.PointAPI.OnLoadSpawnPoints += SpawnPointCreator.OrganizeSpawns;
+			Exiled.Events.Handlers.Server.ReloadedConfigs += SpawnPointCreator.Reload;
 		}
 
 		public override void OnDisabled() {
-			_harmony.UnpatchAll();
-			Exiled.Events.Handlers.Server.WaitingForPlayers -= DefaultSpawnEditor.CreateNewSpawns;
-			base.OnDisabled();
-			//Data.Disable();
+
 		}
 	}
 }
