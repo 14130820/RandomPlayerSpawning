@@ -1,13 +1,13 @@
 ﻿using Exiled.API.Interfaces;
 
-namespace ArithFeather.RandomPlayerSpawning
+namespace ArithFeather.CustomPlayerSpawning
 {
 	public class Config : IConfig {
 		public bool IsEnabled { get; set; } = true;
 
-		/// <summary>
-		/// Randomly spawn everything except SCP.
-		/// </summary>
-		public static bool UseDefaultSpawnSettings { get; set; } = true;
+		///// <summary>
+		///// Randomly spawn everything except SCP.
+		///// </summary>
+		//public static bool UseDefaultSpawnSettings { get; set; } = true;
 	}
 }

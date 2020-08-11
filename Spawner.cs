@@ -3,225 +3,236 @@ using Exiled.API.Features;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using ArithFeather.AriToolKit;
+using ArithFeather.AriToolKit.Components;
+using Exiled.Events.EventArgs;
 using UnityEngine;
 using PlayerEvents = Exiled.Events.Handlers.Player;
 using Random = UnityEngine.Random;
 using ServerEvents = Exiled.Events.Handlers.Server;
 
-namespace ArithFeather.RandomPlayerSpawning {
+namespace ArithFeather.CustomPlayerSpawning {
 	public class Spawner {
-		private const string PlayerSpawnPointFileName = "RandomPlayerSpawnData";
-		private const int SafeSpawnDistance = 30;
-		private const int EnemySafeSpawnDistance = 60;
+		//private const string PlayerFixedPointFileName = "RandomPlayerSpawnData";
+		//private const int SafeSpawnDistance = 30;
+		//private const int EnemySafeSpawnDistance = 60;
 
-		public void Enable() {
-			ServerEvents.WaitingForPlayers += ServerEvents_WaitingForPlayers;
-			PlayerEvents.Spawning += PlayerEvents_Spawning;
-			if (Config.UseDefaultSpawnSettings) {
-				OnRandomPlayerSpawning += Spawner_OnRandomPlayerSpawning;
-			}
-		}
+		//public void Enable() {
+			//ServerEvents.WaitingForPlayers += ServerEvents_WaitingForPlayers;
+			//PlayerEvents.Spawning += PlayerEvents_Spawning;
+			//if (Config.UseDefaultSpawnSettings) {
+			//	OnRandomPlayerSpawning += Spawner_OnRandomPlayerSpawning;
+			//}
+		//}
 
-		public void Disable() {
-			ServerEvents.WaitingForPlayers -= ServerEvents_WaitingForPlayers;
-			PlayerEvents.Spawning -= PlayerEvents_Spawning;
-			if (Config.UseDefaultSpawnSettings) {
-				OnRandomPlayerSpawning -= Spawner_OnRandomPlayerSpawning;
-			}
-		}
+		//public void Disable() {
+		//	ServerEvents.WaitingForPlayers -= ServerEvents_WaitingForPlayers;
+		//	PlayerEvents.Spawning -= PlayerEvents_Spawning;
+		//	if (Config.UseDefaultSpawnSettings) {
+		//		OnRandomPlayerSpawning -= Spawner_OnRandomPlayerSpawning;
+		//	}
+		//}
+		
+		//public void Reload() => _playerSpawnData = PointAPI.GetPointList(PlayerFixedPointFileName);
+		//private PointList _playerSpawnData = PointAPI.GetPointList(PlayerFixedPointFileName);
 
-		private List<SpawnPoint> _playerSpawnData;
-		/// <summary>
-		/// This is the data that is loaded from the file
-		/// </summary>
-		public List<SpawnPoint> PlayerSpawnData => _playerSpawnData ?? (_playerSpawnData = new List<SpawnPoint>());
+		//private List<List<PlayerFixedPoint>> _playerLoadedSpawns;
 
-		private List<PlayerSpawnPoint> _playerLoadedSpawns;
-		/// <summary>
-		/// This takes the playerSpawnData and applies it to every room (in case duplicate room types).
-		/// </summary>
-		public List<PlayerSpawnPoint> PlayerLoadedSpawns => _playerLoadedSpawns ?? (_playerLoadedSpawns = new List<PlayerSpawnPoint>());
+		///// <summary>
+		///// This takes the playerSpawnData and applies it to every room (in case duplicate room types).
+		///// </summary>
+		//public List<List<PlayerFixedPoint>> PlayerLoadedSpawns => _playerLoadedSpawns;
 
-		public bool NoSpawns => PlayerLoadedSpawns.Count == 0;
+		///// <summary>
+		///// Loads all the spawn point data.
+		///// </summary>
+		//private void ServerEvents_WaitingForPlayers() {
+		//	PlayerLoadedSpawns.Clear();
 
-		/// <summary>
-		/// Loads all the spawn point data.
-		/// </summary>
-		private void ServerEvents_WaitingForPlayers() {
-			LoadPlayerData();
+		//	var roomGroupedSpawns = _playerSpawnData.RoomGroupedFixedPoints;
 
-			PlayerLoadedSpawns.Clear();
+		//	var rooms = Rooms.CustomRooms;
+		//	var roomCount = rooms.Count;
 
-			var playerPointCount = PlayerSpawnData.Count;
-			var rooms = Map.Rooms;
-			var roomCount = rooms.Count;
+		//	for (int i = 0; i < roomCount; i++)
+		//	{
+		//		var room = rooms[i];
 
-			// Create player spawn points on map
-			for (var i = 0; i < roomCount; i++) {
-				var r = rooms[i];
-				var roomName = r.Name;
-				AriToolKit.Extensions.TryFormatTransformRoomName(ref roomName);
+		//		var fixedSpawns = roomGroupedSpawns[i];
+		//		var fixedSpawnCount = fixedSpawns.Count;
 
-				for (var j = 0; j < playerPointCount; j++) {
-					var p = PlayerSpawnData[j];
+		//		if (fixedSpawnCount == 0) continue;
 
-					if (p.RoomType == roomName) {
-						PlayerLoadedSpawns.Add(new PlayerSpawnPoint(p.RoomType, p.ZoneType,
-							r.Transform.TransformPoint(p.Position) + new Vector3(0, 0.3f, 0),
-							r.Transform.TransformDirection(p.Rotation)));
-					}
-				}
-			}
+		//		var playerFixedSpawns = new List<PlayerFixedPoint>();
 
-			if (NoSpawns) {
-				Log.Warn("ArithFeather: There are no player spawn points set.");
-			}
+		//		for (int j = 0; j < fixedSpawnCount; j++)
+		//		{
+		//			playerFixedSpawns.Add(new PlayerFixedPoint(fixedSpawns[j]));
+		//		}
+		//		_playerLoadedSpawns.Add(playerFixedSpawns);
+		//	}
 
-			CachedFreeRooms.Clear();
-			CachedFreeRooms.AddRange(PlayerLoadedSpawns);
-		}
+		//	CachedFreeRooms.Clear();
+		//	CachedFreeRooms.AddRange(_playerSpawnData.FixedPoints);
+		//}
 
-		public void LoadPlayerData() => _playerSpawnData = PointAPI.GetPointList(PlayerSpawnPointFileName);
+		//// Getting Spawns
 
-		// Getting Spawns
+		//// these cached values are used for storing the list of free rooms when a player spawns.
+		//private readonly List<byte> _cachedOccupiedRooms = new List<byte>();
+		//private readonly List<TeamPlayer> _cachedPlayerPos = new List<TeamPlayer>(40);
 
-		// these cached values are used for storing the list of free rooms when a player spawns.
-		public List<SpawnPoint> CachedFreeRooms = new List<SpawnPoint>();
-		private readonly List<TeamPlayer> _cachedPlayerPos = new List<TeamPlayer>(40);
+		//private class RoomOccupied
+		//{
+		//	public bool Occupied { get; set; }
 
-		private class TeamPlayer {
-			public TeamPlayer(bool isEnemy, Vector3 position) {
-				IsEnemy = isEnemy;
-				Position = position;
-			}
+		//	public readonly Room Room;
 
-			public bool IsEnemy { get; }
-			public Vector3 Position { get; }
-		}
+		//	public RoomOccupied(Room room)
+		//	{
+		//		Room = room;
+		//		Occupied = occupied;
+		//	}
+		//}
 
-		/// <summary>
-		/// Updates all the free spawn points using default max distances to other players.
-		/// </summary>
-		public void UpdateFreeSpawns() {
-			var loadedSpawnCount = _playerLoadedSpawns.Count;
+		//private class TeamPlayer {
+		//	public TeamPlayer(bool isEnemy, Vector3 position) {
+		//		IsEnemy = isEnemy;
+		//		Position = position;
+		//	}
 
-			if (loadedSpawnCount == 0) return;
+		//	public bool IsEnemy { get; }
+		//	public Vector3 Position { get; }
+		//}
 
-			CachePlayerDistances();
+		///// <summary>
+		///// Updates all the free spawn points using default max distances to other players.
+		///// </summary>
+		//public void UpdateFreeSpawns()
+		//{
+		//	var players = Player.List.ToList();
+		//	var playerCount = players.Count;
 
-			// Find spawns that have no players or SCP near
-			CachedFreeRooms.Clear();
+		//	for (int i = 0; i < playerCount; i++)
+		//	{
+		//		var room = players[i].CurrentRoom.GetCustomRoom().Id;
 
-			UpdateFreeSpawns(SafeSpawnDistance, EnemySafeSpawnDistance);
-		}
 
-		private void UpdateFreeSpawns(int distanceToCheck, int enemyDistanceToCheck) {
-			var loadedSpawnCount = _playerLoadedSpawns.Count;
+		//	}
 
-			for (var i = 0; i < loadedSpawnCount; i++) {
-				var loadedSpawn = PlayerLoadedSpawns[i];
+		//	CachePlayerDistances();
 
-				if (!loadedSpawn.IsFreePoint && !IsPlayerInRange(loadedSpawn, distanceToCheck, enemyDistanceToCheck)) {
-					loadedSpawn.IsFreePoint = true;
-					CachedFreeRooms.Add(loadedSpawn);
-				}
-			}
+		//	UpdateFreeSpawns(SafeSpawnDistance, EnemySafeSpawnDistance);
+		//}
 
-			if (CachedFreeRooms.Count < 1) {
-				distanceToCheck = Mathf.Clamp((distanceToCheck - 10), 0, 500);
-				enemyDistanceToCheck = Mathf.Clamp((enemyDistanceToCheck - 10), 0, 500);
-				UpdateFreeSpawns(distanceToCheck, enemyDistanceToCheck);
-			}
-		}
+		//private void UpdateFreeSpawns(int distanceToCheck, int enemyDistanceToCheck) {
+		//	var loadedSpawnCount = _playerLoadedSpawns.Count;
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static bool IsPlayerInRange(PlayerSpawnPoint spawn, int range, int enemyRange) {
-			var distances = spawn.PlayerDistances;
-			var distanceCount = distances.Count;
-			for (int i = 0; i < distanceCount; i++) {
-				var player = distances[i];
-				if ((player.IsEnemy && player.Distance <= enemyRange) || player.Distance <= range) {
-					return true;
-				}
-			}
 
-			return false;
-		}
+		//	//for (var i = 0; i < loadedSpawnCount; i++) {
+		//	//	var loadedSpawn = PlayerLoadedSpawns[i];
+		//	//	//todo compare room pos to player pos instead of spawn, faster.	
+		//	//	if (!loadedSpawn.IsFreePoint && !IsPlayerInRange(loadedSpawn, distanceToCheck, enemyDistanceToCheck)) {
+		//	//		loadedSpawn.IsFreePoint = true;
+		//	//		CachedFreeRooms.Add(loadedSpawn);
+		//	//	}
+		//	//}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void CachePlayerDistances() {
-			// Cache Player positions
-			var players = Player.List.ToList();
-			var playerCount = players.Count;
-			_cachedPlayerPos.Clear();
-			for (int i = 0; i < playerCount; i++) {
-				var player = players[i];
+		//	if (CachedFreeRooms.Count < 1) {
+		//		distanceToCheck = Mathf.Clamp((distanceToCheck - 10), 0, 500);
+		//		enemyDistanceToCheck = Mathf.Clamp((enemyDistanceToCheck - 10), 0, 500);
+		//		UpdateFreeSpawns(distanceToCheck, enemyDistanceToCheck);
+		//	}
+		//}
 
-				_cachedPlayerPos.Add(new TeamPlayer(player.Team == Team.SCP, player.Position));
-			}
+		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		//private static bool IsPlayerInRange(PlayerFixedPoint spawn, int range, int enemyRange) {
+		//	var distances = spawn.PlayerDistances;
+		//	var distanceCount = distances.Count;
+		//	for (int i = 0; i < distanceCount; i++) {
+		//		var player = distances[i];
+		//		if ((player.IsEnemy && player.Distance <= enemyRange) || player.Distance <= range) {
+		//			return true;
+		//		}
+		//	}
 
-			// Cache Player Distances
-			var loadedSpawnCount = _playerLoadedSpawns.Count;
+		//	return false;
+		//}
 
-			for (var i = 0; i < loadedSpawnCount; i++) {
-				var loadedSpawn = _playerLoadedSpawns[i];
-				loadedSpawn.IsFreePoint = false;
-				var loadedSpawnPointPos = loadedSpawn.Position;
-				var distances = loadedSpawn.PlayerDistances;
-				distances.Clear();
+		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		//private void CachePlayerDistances() {
+		//	// Cache Player positions
+		//	var players = Player.List.ToList();
+		//	var playerCount = players.Count;
+		//	_cachedPlayerPos.Clear();
+		//	for (int i = 0; i < playerCount; i++) {
+		//		var player = players[i];
 
-				for (int k = 0; k < playerCount; k++) {
-					var cachedValue = _cachedPlayerPos[k];
-					var distance = Vector3.Distance(cachedValue.Position, loadedSpawnPointPos);
+		//		_cachedPlayerPos.Add(new TeamPlayer(player.Team == Team.SCP, player.Position));
+		//	}
 
-					if ((!cachedValue.IsEnemy || distance <= EnemySafeSpawnDistance) && (cachedValue.IsEnemy || distance <= SafeSpawnDistance)) {
-						distances.Add(new PlayerSpawnPoint.TeamDistance(cachedValue.IsEnemy, distance));
-					}
-				}
-			}
-		}
+		//	// Cache Player Distances
+		//	var loadedSpawnCount = _playerLoadedSpawns.Count;
 
-		#region Spawner
+		//	for (var i = 0; i < loadedSpawnCount; i++) {
+		//		var loadedSpawn = _playerLoadedSpawns[i];
+		//		loadedSpawn.IsFreePoint = false;
+		//		var loadedFixedPointPos = loadedSpawn.Position;
+		//		var distances = loadedSpawn.PlayerDistances;
+		//		distances.Clear();
 
-		public delegate void PlayerSpawning(RandomSpawnEventArgs ev);
-		public event PlayerSpawning OnRandomPlayerSpawning;
+		//		for (int k = 0; k < playerCount; k++) {
+		//			var cachedValue = _cachedPlayerPos[k];
+		//			var distance = Vector3.Distance(cachedValue.Position, loadedFixedPointPos);
 
-		private void PlayerEvents_Spawning(Exiled.Events.EventArgs.SpawningEventArgs ev) {
-			if (NoSpawns) return;
+		//			if ((!cachedValue.IsEnemy || distance <= EnemySafeSpawnDistance) && (cachedValue.IsEnemy || distance <= SafeSpawnDistance)) {
+		//				distances.Add(new PlayerFixedPoint.TeamDistance(cachedValue.IsEnemy, distance));
+		//			}
+		//		}
+		//	}
+		//}
 
-			var argument = new RandomSpawnEventArgs(ev);
-			OnRandomPlayerSpawning?.Invoke(argument);
+		//#region Spawner
 
-			if (argument.SpawnRandomly) {
-				UpdateFreeSpawns();
-				var freeRoomCount = CachedFreeRooms.Count;
-				if (freeRoomCount > 0) {
-					int randomN = Random.Range(0, freeRoomCount);
-					var point = CachedFreeRooms[randomN];
+		//public delegate void PlayerSpawning(RandomSpawnEventArgs ev);
+		//public event PlayerSpawning OnRandomPlayerSpawning;
 
-					ev.Position = point.Position;
-					ev.RotationY = Vector3.Angle(point.Rotation, Vector3.up);
-					CachedFreeRooms.RemoveAt(randomN);
-				}
-			}
-		}
+		//private void PlayerEvents_Spawning(Exiled.Events.EventArgs.SpawningEventArgs ev) {
+		//	if (NoSpawns) return;
 
-		private void Spawner_OnRandomPlayerSpawning(RandomSpawnEventArgs ev) {
-			switch (ev.Player.Team) {
-				case Team.SCP:
-				case Team.TUT:
-					ev.SpawnRandomly = false;
-					break;
-				case Team.MTF:
-				case Team.CHI:
-				case Team.RSC:
-				case Team.CDP:
-				case Team.RIP:
-					ev.SpawnRandomly = true;
-					break;
-			}
-		}
+		//	var argument = new RandomSpawnEventArgs(ev);
+		//	OnRandomPlayerSpawning?.Invoke(argument);
 
-		#endregion
+		//	if (argument.SpawnRandomly) {
+		//		UpdateFreeSpawns();
+		//		var freeRoomCount = CachedFreeRooms.Count;
+		//		if (freeRoomCount > 0) {
+		//			int randomN = Random.Range(0, freeRoomCount);
+		//			var point = CachedFreeRooms[randomN];
+
+		//			ev.Position = point.Position;
+		//			ev.RotationY = Vector3.Angle(point.Rotation, Vector3.up);
+		//			CachedFreeRooms.RemoveAt(randomN);
+		//		}
+		//	}
+		//}
+
+		//private void Spawner_OnRandomPlayerSpawning(RandomSpawnEventArgs ev) {
+		//	switch (ev.Player.Team) {
+		//		case Team.SCP:
+		//		case Team.TUT:
+		//			ev.SpawnRandomly = false;
+		//			break;
+		//		case Team.MTF:
+		//		case Team.CHI:
+		//		case Team.RSC:
+		//		case Team.CDP:
+		//		case Team.RIP:
+		//			ev.SpawnRandomly = true;
+		//			break;
+		//	}
+		//}
+
+		//#endregion
 	}
 }

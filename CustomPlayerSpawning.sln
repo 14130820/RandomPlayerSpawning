@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30310.162
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomPlayerSpawning", "RandomPlayerSpawning.csproj", "{3AC39707-954C-4EB0-B98E-18E0B9B9D292}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomPlayerSpawning", "CustomPlayerSpawning.csproj", "{3AC39707-954C-4EB0-B98E-18E0B9B9D292}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

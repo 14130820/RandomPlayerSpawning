@@ -1,27 +1,29 @@
 ﻿using ArithFeather.AriToolKit.PointEditor;
-using Exiled.API.Enums;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ArithFeather.RandomPlayerSpawning
+namespace ArithFeather.CustomPlayerSpawning
 {
-	public class PlayerSpawnPoint : SpawnPoint
-	{
-		public PlayerSpawnPoint(string roomType, ZoneType zoneType, Vector3 position, Vector3 rotation) : base(roomType, zoneType, position, rotation) { }
+	//public class PlayerFixedPoint
+	//{
+	//	private readonly FixedPoint _fixedPoint;
+	//	public PlayerFixedPoint(FixedPoint fixedPoint) => _fixedPoint = fixedPoint;
 
-		public List<TeamDistance> PlayerDistances = new List<TeamDistance>(40);
-		public bool IsFreePoint;
+	//	public Vector3 Position => _fixedPoint.Position;
 
-		public class TeamDistance
-		{
-			public TeamDistance(bool isEnemy, float distance)
-			{
-				IsEnemy = isEnemy;
-				Distance = distance;
-			}
+	//	public List<TeamDistance> PlayerDistances = new List<TeamDistance>(40);
+	//	public bool IsFreePoint;
 
-			public bool IsEnemy { get; }
-			public float Distance { get; }
-		}
-	}
+	//	public class TeamDistance
+	//	{
+	//		public TeamDistance(bool isEnemy, float distance)
+	//		{
+	//			IsEnemy = isEnemy;
+	//			Distance = distance;
+	//		}
+
+	//		public bool IsEnemy { get; }
+	//		public float Distance { get; }
+	//	}
+	//}
 }
