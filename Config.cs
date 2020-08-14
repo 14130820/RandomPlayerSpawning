@@ -5,9 +5,8 @@ namespace ArithFeather.CustomPlayerSpawning
 	public class Config : IConfig {
 		public bool IsEnabled { get; set; } = true;
 
-		///// <summary>
-		///// Randomly spawn everything except SCP.
-		///// </summary>
-		//public static bool UseDefaultSpawnSettings { get; set; } = true;
+		public bool UseDefaultSafeSpawns { get; set; } = false;
+		public int DefaultSafeSpawnDistance { get; set; } = 30;
+		public int DefaultEnemySafeSpawnDistance { get; set; } = 60;
 	}
 }

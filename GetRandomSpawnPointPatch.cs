@@ -1,14 +1,17 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
-namespace ArithFeather.CustomPlayerSpawning { 
+namespace ArithFeather.CustomPlayerSpawning {
 	[HarmonyPatch(typeof(SpawnpointManager), "GetRandomPosition")]
-	public static class GetRandomSpawnPointPatch {
+	internal static class GetRandomSpawnPointPatch {
+		public delegate PlayerSpawnPoint GetRandomSpawnPoint(RoleType role);
+		public static event GetRandomSpawnPoint OnGetRandomSpawnPoint;
 
 		private static bool Prefix(ref GameObject __result, RoleType classID)
 		{
-			__result = SpawnPointCreator.GetRandomSpawnPoint(classID);
-			return false;
+			var spawnPoint = OnGetRandomSpawnPoint?.Invoke(classID);
+			__result = spawnPoint?.GameObject;
+			return __result == null;
 		}
 	}
 }
