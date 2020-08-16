@@ -26,7 +26,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 		public static SpawnSettings SpawnSettings { get; set; }
 
 		public override string Author => "Arith";
-		public override Version Version => new Version("2.01");
+		public override Version Version => new Version("2.02");
 		public override PluginPriority Priority => PluginPriority.Last; // Make sure this team spawn event is tested last
 
 		private readonly Harmony _harmony = new Harmony("RandomPlayerSpawning");
@@ -191,7 +191,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 					var roomTransform = room.transform;
 					var position = roomTransform.InverseTransformPoint(spawnTransform.position);
 					var rotation = roomTransform.InverseTransformDirection(spawnTransform.eulerAngles);
-					_pointList.RawPoints.Add(new SpawnPoint(i.ToString(), room.Room.RoomType,
+					_pointList.RawPoints.Add(new SpawnPoint(i.ToString(), room.Room.Type,
 						room.Room.Zone, position, rotation));
 				}
 			}
