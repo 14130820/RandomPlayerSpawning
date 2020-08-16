@@ -111,6 +111,8 @@ namespace ArithFeather.CustomPlayerSpawning {
 		}
 
 		private SpawnSettings GetDefaultSpawnSettings() {
+			Log.Warn("Creating default CustomPlayerSpawns file.");
+
 			var spawnSettings = new SpawnSettings();
 			spawnSettings.DefineSharedSpawns(RoleType.Scp93953, RoleType.Scp93989);
 			spawnSettings.DefineSharedSpawns(RoleType.NtfScientist, RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant);

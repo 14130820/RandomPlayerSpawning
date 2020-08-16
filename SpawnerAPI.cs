@@ -1,6 +1,11 @@
 ﻿namespace ArithFeather.CustomPlayerSpawning {
 	public static class SpawnerAPI
 	{
+		static SpawnerAPI()
+		{
+			GetRandomSpawnPointPatch.OnPlayerSpawningAtPoint += (a) => OnPlayerSpawningAtPoint?.Invoke(a);
+		}
+
 		/// <summary>
 		/// Apply your custom settings on OnEnabled() or leave to use default game settings.
 		/// </summary>
@@ -20,5 +25,8 @@
 		/// Call this when you are done spawning to make sure other spawning mechanics work. (Like console teleport).
 		/// </summary>
 		public static void EndSpawning() => Spawner.EndTeamRespawn();
+
+		public delegate void PlayerSpawningAtPoint(PlayerSpawnPoint playerSpawnPoint);
+		public static event PlayerSpawningAtPoint OnPlayerSpawningAtPoint;
 	}
 }
