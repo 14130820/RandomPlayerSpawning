@@ -108,11 +108,24 @@ namespace ArithFeather.CustomPlayerSpawning {
 					RoleGameObjectDictionary.Add(sharedRole, sharedSpawnPoints);
 				}
 			}
+
+			//todo delete
+
+			int e = 0;
+			int l = 0;
+
+			var spawns = RoleGameObjectDictionary[RoleType.ClassD];
+
+			foreach (var p in spawns)
+			{
+				if (p.Room.Room.Zone == ZoneType.Entrance) e++;
+				if (p.Room.Room.Zone == ZoneType.LightContainment) l++;
+			}
+
+			Log.Error($"Entrance Spawns: {e}  ||  LCZ Spawns: {l}");
 		}
 
 		private SpawnSettings GetDefaultSpawnSettings() {
-			Log.Warn("Creating default CustomPlayerSpawns file.");
-
 			var spawnSettings = new SpawnSettings();
 			spawnSettings.DefineSharedSpawns(RoleType.Scp93953, RoleType.Scp93989);
 			spawnSettings.DefineSharedSpawns(RoleType.NtfScientist, RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant);
@@ -136,6 +149,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 		}
 
 		private void CreateDefaultSpawnPointFile() {
+			Log.Warn("Creating default CustomPlayerSpawns file.");
 			var roleSize = Enum.GetNames(typeof(RoleType)).Length - 1;
 
 			for (int i = 0; i < roleSize; i++) {
