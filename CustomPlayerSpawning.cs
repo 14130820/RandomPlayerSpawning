@@ -108,21 +108,6 @@ namespace ArithFeather.CustomPlayerSpawning {
 					RoleGameObjectDictionary.Add(sharedRole, sharedSpawnPoints);
 				}
 			}
-
-			//todo delete
-
-			int e = 0;
-			int l = 0;
-
-			var spawns = RoleGameObjectDictionary[RoleType.ClassD];
-
-			foreach (var p in spawns)
-			{
-				if (p.Room.Room.Zone == ZoneType.Entrance) e++;
-				if (p.Room.Room.Zone == ZoneType.LightContainment) l++;
-			}
-
-			Log.Error($"Entrance Spawns: {e}  ||  LCZ Spawns: {l}");
 		}
 
 		private SpawnSettings GetDefaultSpawnSettings() {
