@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Exiled.API.Features;
+using HarmonyLib;
 using UnityEngine;
 
 namespace ArithFeather.CustomPlayerSpawning {
@@ -9,10 +10,17 @@ namespace ArithFeather.CustomPlayerSpawning {
 
 		public static event SpawnerAPI.PlayerSpawningAtPoint OnPlayerSpawningAtPoint;
 
-		private static bool Prefix(ref GameObject __result, RoleType classID)
-		{
+		private static bool Prefix(ref GameObject __result, RoleType classID) {
+
 			var spawnPoint = OnGetRandomSpawnPoint?.Invoke(classID);
+
+			if (spawnPoint == null) {
+				Log.Error("No SpawnPoint set.");
+				return true;
+			}
+
 			OnPlayerSpawningAtPoint?.Invoke(spawnPoint);
+
 			__result = spawnPoint?.GameObject;
 			return __result == null;
 		}

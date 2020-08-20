@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ArithFeather.CustomPlayerSpawning {
 	internal static class CachedDistances {
 
-		private static readonly Dictionary<byte, RoomWithPoints> CachedOccupiedRooms = new Dictionary<byte, RoomWithPoints>();
+		private static readonly Dictionary<int, RoomWithPoints> CachedOccupiedRooms = new Dictionary<int, RoomWithPoints>();
 		private static readonly List<RoomWithPoints> CachedRoomPos = new List<RoomWithPoints>();
 		private static readonly List<DistanceToRoom> CachedSpawnDistances = new List<DistanceToRoom>();
 		private static readonly List<PlayerSpawnPoint> CachedFixedPoints = new List<PlayerSpawnPoint>();

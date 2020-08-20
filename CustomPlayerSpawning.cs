@@ -26,7 +26,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 		public static SpawnSettings SpawnSettings { get; set; }
 
 		public override string Author => "Arith";
-		public override Version Version => new Version("2.02");
+		public override Version Version => new Version("2.03");
 		public override PluginPriority Priority => PluginPriority.Last; // Make sure this team spawn event is tested last
 
 		private readonly Harmony _harmony = new Harmony("RandomPlayerSpawning");
