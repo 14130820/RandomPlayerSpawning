@@ -15,6 +15,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 	public class CustomPlayerSpawning : Plugin<Config> {
 		private const string PlayerFixedPointFileName = "CustomPlayerSpawns";
 
+		public static Config Configs;
 		public static readonly int RoleTypeSize = Enum.GetNames(typeof(RoleType)).Length;
 		private static readonly string PointDataFilePath = Path.Combine(PointIO.FolderPath, PlayerFixedPointFileName) + ".txt";
 
@@ -27,11 +28,13 @@ namespace ArithFeather.CustomPlayerSpawning {
 
 		public override string Author => "Arith";
 		public override Version Version => new Version("2.03");
-		public override PluginPriority Priority => PluginPriority.Last; // Make sure this team spawn event is tested last
+		public override PluginPriority Priority => PluginPriority.Lowest; // Make sure this team spawn event is tested last
 
 		private readonly Harmony _harmony = new Harmony("RandomPlayerSpawning");
 
-		public override void OnEnabled() {
+		public override void OnEnabled()
+		{
+			Configs = Config;
 			base.OnEnabled();
 
 			_harmony.PatchAll();
@@ -46,8 +49,6 @@ namespace ArithFeather.CustomPlayerSpawning {
 		}
 
 		public override void OnDisabled() {
-			_harmony.UnpatchAll();
-
 			PointAPI.OnLoadSpawnPoints -= OrganizeSpawns;
 			ServerEvents.ReloadedConfigs -= ReloadConfig;
 			ServerEvents.RespawningTeam -= Spawner.ServerEvents_RespawningTeam;

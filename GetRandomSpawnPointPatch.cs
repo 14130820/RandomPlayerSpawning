@@ -11,6 +11,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 		public static event SpawnerAPI.PlayerSpawningAtPoint OnPlayerSpawningAtPoint;
 
 		private static bool Prefix(ref GameObject __result, RoleType classID) {
+			if (!CustomPlayerSpawning.Configs.IsEnabled) return true;
 
 			var spawnPoint = OnGetRandomSpawnPoint?.Invoke(classID);
 

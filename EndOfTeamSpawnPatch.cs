@@ -10,6 +10,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 
 		private static void Postfix()
 		{
+			if (!CustomPlayerSpawning.Configs.IsEnabled) return;
 			OnEndTeamRespawn?.Invoke();
 		}
 	}
