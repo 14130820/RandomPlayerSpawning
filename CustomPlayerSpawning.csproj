@@ -122,9 +122,9 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AriToolKit\AriToolKit.csproj">
-      <Project>{17927087-C610-457D-89CE-DEE4816DA2FF}</Project>
-      <Name>AriToolKit</Name>
+    <ProjectReference Include="..\Exiled.Points\Exiled.Points.csproj">
+      <Project>{ab7bddd8-5ff5-4b17-a0b3-cb572d7c9243}</Project>
+      <Name>Exiled.Points</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

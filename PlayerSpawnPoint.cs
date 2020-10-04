@@ -1,13 +1,14 @@
-﻿using ArithFeather.AriToolKit.Components;
+﻿using Exiled.API.Features;
 using UnityEngine;
 
-namespace ArithFeather.CustomPlayerSpawning {
+namespace ArithFeather.CustomPlayerSpawning
+{
 	public class PlayerSpawnPoint
 	{
 		public readonly GameObject GameObject;
-		public readonly CustomRoom Room;
+		public readonly Room Room;
 
-		public PlayerSpawnPoint(GameObject gameObject, CustomRoom room)
+		public PlayerSpawnPoint(GameObject gameObject, Room room)
 		{
 			GameObject = gameObject;
 			Room = room;

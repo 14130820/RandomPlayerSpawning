@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
+using Exiled.Points;
 using UnityEngine;
 
 namespace ArithFeather.CustomPlayerSpawning {
 	internal static class CachedDistances {
 
-		private static readonly Dictionary<int, RoomWithPoints> CachedOccupiedRooms = new Dictionary<int, RoomWithPoints>();
+		private static readonly Dictionary<uint, RoomWithPoints> CachedOccupiedRooms = new Dictionary<uint, RoomWithPoints>();
 		private static readonly List<RoomWithPoints> CachedRoomPos = new List<RoomWithPoints>();
 		private static readonly List<DistanceToRoom> CachedSpawnDistances = new List<DistanceToRoom>();
 		private static readonly List<PlayerSpawnPoint> CachedFixedPoints = new List<PlayerSpawnPoint>();
@@ -29,10 +30,10 @@ namespace ArithFeather.CustomPlayerSpawning {
 			for (int i = 0; i < pointCount; i++) {
 				var point = pointsToCheck[i];
 				var room = point.Room;
-				var id = room.Id;
+				var id = room.Id();
 
 				if (!CachedOccupiedRooms.TryGetValue(id, out var roomWithPoints)) {
-					roomWithPoints = new RoomWithPoints(room.transform.position);
+					roomWithPoints = new RoomWithPoints(room.Transform.position);
 					roomWithPoints.Points.Add(point);
 
 					CachedOccupiedRooms.Add(id, roomWithPoints);

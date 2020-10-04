@@ -1,34 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ArithFeather.AriToolKit;
-using ArithFeather.AriToolKit.Components;
-using ArithFeather.AriToolKit.PointEditor;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.Points;
 using HarmonyLib;
 using UnityEngine;
-using SpawnPoint = ArithFeather.AriToolKit.PointEditor.Point;
 using ServerEvents = Exiled.Events.Handlers.Server;
 
-namespace ArithFeather.CustomPlayerSpawning {
-	public class CustomPlayerSpawning : Plugin<Config> {
+namespace ArithFeather.CustomPlayerSpawning
+{
+	public class CustomPlayerSpawning : Plugin<Config>
+	{
 		private const string PlayerFixedPointFileName = "CustomPlayerSpawns";
+		private static Version CurrentVersion = new Version(3, 0);
 
 		public static Config Configs;
 		public static readonly int RoleTypeSize = Enum.GetNames(typeof(RoleType)).Length;
-		private static readonly string PointDataFilePath = Path.Combine(PointIO.FolderPath, PlayerFixedPointFileName) + ".txt";
+
+		private static readonly string PointDataFilePath =
+			Path.Combine(PointIO.FolderPath, PlayerFixedPointFileName) + ".txt";
 
 		private bool _spawnFileExists;
 		private PointList _pointList;
 
 		// Loaded every game
-		public static readonly Dictionary<RoleType, IReadOnlyList<PlayerSpawnPoint>> RoleGameObjectDictionary = new Dictionary<RoleType, IReadOnlyList<PlayerSpawnPoint>>();
+		public static readonly Dictionary<RoleType, IReadOnlyList<PlayerSpawnPoint>> RoleGameObjectDictionary =
+			new Dictionary<RoleType, IReadOnlyList<PlayerSpawnPoint>>();
+
 		public static SpawnSettings SpawnSettings { get; set; }
 
 		public override string Author => "Arith";
-		public override Version Version => new Version("2.03");
-		public override PluginPriority Priority => PluginPriority.Lowest; // Make sure this team spawn event is tested last
+		public override Version Version => CurrentVersion;
+
+		public override PluginPriority Priority =>
+			PluginPriority.Lowest; // Make sure this team spawn event is tested last
 
 		private readonly Harmony _harmony = new Harmony("RandomPlayerSpawning");
 
@@ -39,7 +46,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 
 			_harmony.PatchAll();
 
-			PointAPI.OnLoadSpawnPoints += OrganizeSpawns;
+			Points.OnLoadSpawnPoints += OrganizeSpawns;
 			ServerEvents.ReloadedConfigs += ReloadConfig;
 			ServerEvents.RespawningTeam += Spawner.ServerEvents_RespawningTeam;
 			GetRandomSpawnPointPatch.OnGetRandomSpawnPoint += Spawner.GetRandomSpawnPointPatch_OnGetRandomSpawnPoint;
@@ -48,8 +55,9 @@ namespace ArithFeather.CustomPlayerSpawning {
 			ReloadConfig();
 		}
 
-		public override void OnDisabled() {
-			PointAPI.OnLoadSpawnPoints -= OrganizeSpawns;
+		public override void OnDisabled()
+		{
+			Points.OnLoadSpawnPoints -= OrganizeSpawns;
 			ServerEvents.ReloadedConfigs -= ReloadConfig;
 			ServerEvents.RespawningTeam -= Spawner.ServerEvents_RespawningTeam;
 			GetRandomSpawnPointPatch.OnGetRandomSpawnPoint -= Spawner.GetRandomSpawnPointPatch_OnGetRandomSpawnPoint;
@@ -58,19 +66,22 @@ namespace ArithFeather.CustomPlayerSpawning {
 			base.OnDisabled();
 		}
 
-		private void ReloadConfig() {
-			_pointList = PointAPI.GetPointList(PlayerFixedPointFileName);
+		private void ReloadConfig()
+		{
+			_pointList = Points.GetPointList(PlayerFixedPointFileName);
 			_spawnFileExists = FileManager.FileExists(PointDataFilePath);
 		}
 
-		private void OrganizeSpawns() {
+		private void OrganizeSpawns()
+		{
 			if (!_spawnFileExists) CreateDefaultSpawnPointFile();
 			if (SpawnSettings == null) SpawnSettings = GetDefaultSpawnSettings();
 
 			RoleGameObjectDictionary.Clear();
 
 			// For each role, get who they share spawns with.
-			for (int i = 0; i < RoleTypeSize; i++) {
+			for (int i = 0; i < RoleTypeSize; i++)
+			{
 				var role = (RoleType)i;
 
 				// Make sure the role isn't already populated
@@ -82,20 +93,23 @@ namespace ArithFeather.CustomPlayerSpawning {
 				var sharedSpawnPoints = new List<PlayerSpawnPoint>();
 
 				// Create a list of GameObjects using those shared spawn points.
-				for (int j = 0; j < sharedRolesSize; j++) {
+				for (int j = 0; j < sharedRolesSize; j++)
+				{
 					var sharedRole = sharedRoles[j];
-					if (_pointList.IdGroupedFixedPoints.TryGetValue(((int)sharedRole).ToString(), out var spawnList)) {
+					if (_pointList.IdGroupedFixedPoints.TryGetValue(((int)sharedRole).ToString(), out var spawnList))
+					{
 
 						var spawnCount = spawnList.Count;
 
-						for (int k = 0; k < spawnCount; k++) {
+						for (int k = 0; k < spawnCount; k++)
+						{
 							var spawn = spawnList[k];
 
 							var go = new GameObject(spawn.Id);
 							go.transform.position = spawn.Position;
 							go.transform.rotation = spawn.Rotation;
 
-							sharedSpawnPoints.Add(new PlayerSpawnPoint(go, spawn.CustomRoom));
+							sharedSpawnPoints.Add(new PlayerSpawnPoint(go, spawn.Room));
 						}
 					}
 				}
@@ -103,7 +117,8 @@ namespace ArithFeather.CustomPlayerSpawning {
 				if (sharedSpawnPoints.Count == 0) continue;
 
 				// Assign the shared roles the Game Objects.
-				for (int j = 0; j < sharedRolesSize; j++) {
+				for (int j = 0; j < sharedRolesSize; j++)
+				{
 					var sharedRole = sharedRoles[j];
 
 					RoleGameObjectDictionary.Add(sharedRole, sharedSpawnPoints);
@@ -111,40 +126,54 @@ namespace ArithFeather.CustomPlayerSpawning {
 			}
 		}
 
-		private SpawnSettings GetDefaultSpawnSettings() {
+		private SpawnSettings GetDefaultSpawnSettings()
+		{
 			var spawnSettings = new SpawnSettings();
 			spawnSettings.DefineSharedSpawns(RoleType.Scp93953, RoleType.Scp93989);
-			spawnSettings.DefineSharedSpawns(RoleType.NtfScientist, RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant);
+			spawnSettings.DefineSharedSpawns(RoleType.NtfScientist, RoleType.NtfCadet, RoleType.NtfCommander,
+				RoleType.NtfLieutenant);
 
 			if (Config.UseDefaultSafeSpawns)
 			{
 				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
-					new[] { RoleType.ChaosInsurgency, RoleType.ClassD },
+					new[] {RoleType.ChaosInsurgency, RoleType.ClassD},
 					Config.DefaultSafeSpawnDistance, Config.DefaultEnemySafeSpawnDistance));
 
 				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
-					new[] { RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant, RoleType.NtfScientist, RoleType.Scientist, RoleType.FacilityGuard },
+					new[]
+					{
+						RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant, RoleType.NtfScientist,
+						RoleType.Scientist, RoleType.FacilityGuard
+					},
 					Config.DefaultSafeSpawnDistance, Config.DefaultEnemySafeSpawnDistance));
 
 				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
-					new[] { RoleType.Scp93953, RoleType.Scp049, RoleType.Scp096, RoleType.Scp106, RoleType.Scp93989, RoleType.Scp173 },
+					new[]
+					{
+						RoleType.Scp93953, RoleType.Scp049, RoleType.Scp096, RoleType.Scp106, RoleType.Scp93989,
+						RoleType.Scp173
+					},
 					Config.DefaultSafeSpawnDistance, Config.DefaultEnemySafeSpawnDistance));
 			}
 
 			return spawnSettings;
 		}
 
-		private void CreateDefaultSpawnPointFile() {
+		private void CreateDefaultSpawnPointFile()
+		{
 			Log.Warn("Creating default CustomPlayerSpawns file.");
 			var roleSize = Enum.GetNames(typeof(RoleType)).Length - 1;
 
-			for (int i = 0; i < roleSize; i++) {
+			for (int i = 0; i < roleSize; i++)
+			{
 				var roleType = (RoleType)i;
 
 				GameObject[] spawns = GetDefaultSpawnPoints(roleType);
 
-				GameObject[] GetDefaultSpawnPoints(RoleType role) {
-					switch (role) {
+				GameObject[] GetDefaultSpawnPoints(RoleType role)
+				{
+					switch (role)
+					{
 						case RoleType.Scp106: return GameObject.FindGameObjectsWithTag("SP_106");
 						case RoleType.Scp049: return GameObject.FindGameObjectsWithTag("SP_049");
 						case RoleType.Scp079: return GameObject.FindGameObjectsWithTag("SP_079");
@@ -156,7 +185,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 						case RoleType.ChaosInsurgency: return GameObject.FindGameObjectsWithTag("SP_CI");
 						case RoleType.Scientist: return GameObject.FindGameObjectsWithTag("SP_RSC");
 						case RoleType.ClassD: return GameObject.FindGameObjectsWithTag("SP_CDP");
-						case RoleType.Tutorial: return new[] { GameObject.Find("TUT Spawn") };
+						case RoleType.Tutorial: return new[] {GameObject.Find("TUT Spawn")};
 						default: return null;
 					}
 				}
@@ -165,26 +194,49 @@ namespace ArithFeather.CustomPlayerSpawning {
 
 				var spawnCount = spawns.Length;
 
-				for (int j = 0; j < spawnCount; j++) {
+				for (int j = 0; j < spawnCount; j++)
+				{
 					var spawnPoint = spawns[j];
-					var room = spawnPoint.GetComponentInParent<CustomRoom>();
 
-					if (room == null) {
-						room = Rooms.CustomRooms[Rooms.CustomRooms.Count - 1];
+					var secter = spawnPoint.GetComponentInParent<SECTR_Sector>();
+
+					// if no secter found, return surface.
+					var room = secter == null
+						? Map.Rooms[Map.Rooms.Count - 1]
+						: Map.Rooms.First(x => x.Transform.gameObject == secter.gameObject);
+
+					if (room == null)
+					{
+						Log.Error($"Could not find room for {roleType}");
+						continue;
 					}
 
 					var spawnTransform = spawnPoint.transform;
-					var roomTransform = room.transform;
+					var roomTransform = room.Transform;
 					var position = roomTransform.InverseTransformPoint(spawnTransform.position);
 					var rotation = roomTransform.InverseTransformDirection(spawnTransform.eulerAngles);
-					_pointList.RawPoints.Add(new SpawnPoint(i.ToString(), room.Room.Type,
-						room.Room.Zone, position, rotation));
+					_pointList.RawPoints.Add(new RawPoint(i.ToString(), room.Type, position, rotation));
 				}
 			}
 
 			PointIO.Save(_pointList, PointDataFilePath);
 			_pointList.FixData();
 			_spawnFileExists = true;
+		}
+
+		/// <summary>
+		/// Shuffle a list using Unity.
+		/// </summary>
+		public static void UnityShuffle<T>(IList<T> list)
+		{
+			for (var i = list.Count - 1; i > 1; i--)
+			{
+				var rnd = UnityEngine.Random.Range(0, i + 1);
+
+				var value = list[rnd];
+				list[rnd] = list[i];
+				list[i] = value;
+			}
 		}
 	}
 }

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ArithFeather.AriToolKit;
 using Respawning;
 using Random = UnityEngine.Random;
 
-namespace ArithFeather.CustomPlayerSpawning {
-	internal static class Spawner {
-
+namespace ArithFeather.CustomPlayerSpawning
+{
+	internal static class Spawner
+	{
 		private static Dictionary<RoleType, IReadOnlyList<PlayerSpawnPoint>> RoleGameObjectDictionary =>
 			CustomPlayerSpawning.RoleGameObjectDictionary;
 
@@ -19,7 +19,8 @@ namespace ArithFeather.CustomPlayerSpawning {
 
 		public static void EndTeamRespawn() => _useFilteredSpawns = false;
 
-		public static PlayerSpawnPoint GetRandomSpawnPointPatch_OnGetRandomSpawnPoint(RoleType role) {
+		public static PlayerSpawnPoint GetRandomSpawnPointPatch_OnGetRandomSpawnPoint(RoleType role)
+		{
 			// Try to get a filtered spawn
 			if (_useFilteredSpawns)
 			{
@@ -33,10 +34,12 @@ namespace ArithFeather.CustomPlayerSpawning {
 			return new PlayerSpawnPoint(null, null);
 		}
 
-		private static bool TryGetRandomFilteredSpawn(out PlayerSpawnPoint filteredSpawn) {
+		private static bool TryGetRandomFilteredSpawn(out PlayerSpawnPoint filteredSpawn)
+		{
 			var filteredSpawnsCount = _filteredSpawns.Count;
 
-			if (filteredSpawnsCount != 0) {
+			if (filteredSpawnsCount != 0)
+			{
 				if (_filteredSpawnIndex == _filteredSpawns.Count)
 					_filteredSpawnIndex = 0;
 
@@ -49,7 +52,8 @@ namespace ArithFeather.CustomPlayerSpawning {
 			return false;
 		}
 
-		public static void ServerEvents_RespawningTeam(Exiled.Events.EventArgs.RespawningTeamEventArgs ev) {
+		public static void ServerEvents_RespawningTeam(Exiled.Events.EventArgs.RespawningTeamEventArgs ev)
+		{
 			// Default game logic 
 			var spawningPlayers = ev.Players;
 			var spawningPlayersCount = spawningPlayers.Count;
@@ -79,7 +83,7 @@ namespace ArithFeather.CustomPlayerSpawning {
 			_filteredSpawns = DistanceInfo.TryGetValue(role, out var roleDistances) ?
 				CachedDistances.CalculateSpawns(spawns, roleDistances, numberOfPoints) : spawns.ToList();
 
-			_filteredSpawns.UnityShuffle();
+			CustomPlayerSpawning.UnityShuffle(_filteredSpawns);
 			_filteredSpawnIndex = 0;
 			_useFilteredSpawns = true;
 		}

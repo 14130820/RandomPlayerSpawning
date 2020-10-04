@@ -1,18 +1,20 @@
 ﻿using System.Collections.Generic;
 
-namespace ArithFeather.CustomPlayerSpawning {
-
+namespace ArithFeather.CustomPlayerSpawning
+{
 	/// <summary>
 	/// Holds data to define how the game will handle spawning players.
 	/// </summary>
-	public class SpawnSettings {
+	public class SpawnSettings
+	{
+		internal readonly Dictionary<RoleType, List<RoleType>> PopulatedSharedSpawnInfo = new Dictionary<RoleType, List<RoleType>>();
+		internal readonly Dictionary<RoleType, Dictionary<RoleType, float>> PopulatedDistanceInfo = new Dictionary<RoleType, Dictionary<RoleType, float>>();
 
-		public readonly Dictionary<RoleType, List<RoleType>> PopulatedSharedSpawnInfo = new Dictionary<RoleType, List<RoleType>>();
-		public readonly Dictionary<RoleType, Dictionary<RoleType, float>> PopulatedDistanceInfo = new Dictionary<RoleType, Dictionary<RoleType, float>>();
-
-		public SpawnSettings() {
+		public SpawnSettings()
+		{
 			// Populate Role Groups
-			for (int i = 0; i < CustomPlayerSpawning.RoleTypeSize; i++) {
+			for (int i = 0; i < CustomPlayerSpawning.RoleTypeSize; i++)
+			{
 				var role = (RoleType)i;
 				PopulatedSharedSpawnInfo.Add(role, new List<RoleType> { role });
 			}
@@ -22,10 +24,12 @@ namespace ArithFeather.CustomPlayerSpawning {
 		/// Define one of these for each team where you want the team to spawn a certain distance away from the enemy team or your own team.
 		/// </summary>
 		/// <param name="distanceCheckInfo"></param>
-		public void DefineSafeSpawnDistances(DistanceCheckInfo distanceCheckInfo) {
+		public void DefineSafeSpawnDistances(DistanceCheckInfo distanceCheckInfo)
+		{
 			var myTeam = distanceCheckInfo.MyTeam;
 			var counter = myTeam.Length;
-			for (int i = 0; i < counter; i++) {
+			for (int i = 0; i < counter; i++)
+			{
 				var myRole = myTeam[i];
 				if (!PopulatedDistanceInfo.ContainsKey(myRole))
 					PopulatedDistanceInfo.Add(myRole, distanceCheckInfo.TeamInfo);
@@ -35,12 +39,15 @@ namespace ArithFeather.CustomPlayerSpawning {
 		/// <summary>
 		/// Define any Roles that share the same spawns.
 		/// </summary>
-		public void DefineSharedSpawns(params RoleType[] rolesSharingSpawns) {
+		public void DefineSharedSpawns(params RoleType[] rolesSharingSpawns)
+		{
 			var counter = rolesSharingSpawns.Length;
-			for (int i = 0; i < counter; i++) {
+			for (int i = 0; i < counter; i++)
+			{
 				var role = rolesSharingSpawns[i];
 
-				for (int j = 0; j < counter; j++) {
+				for (int j = 0; j < counter; j++)
+				{
 					var roleToAdd = rolesSharingSpawns[j];
 					var roleGroup = PopulatedSharedSpawnInfo[role];
 

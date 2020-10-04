@@ -1,7 +1,8 @@
 ﻿using HarmonyLib;
 using Respawning;
 
-namespace ArithFeather.CustomPlayerSpawning {
+namespace ArithFeather.CustomPlayerSpawning
+{
 	[HarmonyPatch(typeof(RespawnManager), "Spawn")]
 	internal static class EndOfTeamSpawnPatch
 	{

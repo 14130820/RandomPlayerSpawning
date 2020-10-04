@@ -1,4 +1,5 @@
-﻿namespace ArithFeather.CustomPlayerSpawning {
+﻿namespace ArithFeather.CustomPlayerSpawning
+{
 	public static class SpawnerAPI
 	{
 		static SpawnerAPI()
@@ -7,7 +8,7 @@
 		}
 
 		/// <summary>
-		/// Apply your custom settings on OnEnabled() or leave to use default game settings.
+		/// Apply your custom settings on OnEnabled() or ignore to use default game settings.
 		/// </summary>
 		/// <param name="settings"><see cref="SpawnSettings"/>"/></param>
 		public static void ApplySettings(SpawnSettings settings) =>
@@ -15,6 +16,7 @@
 
 		/// <summary>
 		/// This should be called once every time before you perform spawning on a specific role.
+		/// It makes sure there are enough available spawn points for your spawns, using the <see cref="SpawnSettings"/>.
 		/// </summary>
 		/// <param name="role">The role of the player(s) you are spawning</param>
 		/// <param name="numberOfSpawns">The number of players you are going to spawn.</param>
@@ -27,6 +29,10 @@
 		public static void EndSpawning() => Spawner.EndTeamRespawn();
 
 		public delegate void PlayerSpawningAtPoint(PlayerSpawnPoint playerSpawnPoint);
+
+		/// <summary>
+		/// Invokes right before the player spawns, giving you the spawn point information.
+		/// </summary>
 		public static event PlayerSpawningAtPoint OnPlayerSpawningAtPoint;
 	}
 }
