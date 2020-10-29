@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using ArithFeather.Points.DataTypes;
+using ArithFeather.Points.Tools;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.Points;
 using HarmonyLib;
 using UnityEngine;
 using ServerEvents = Exiled.Events.Handlers.Server;
@@ -14,7 +14,7 @@ namespace ArithFeather.CustomPlayerSpawning
 	public class CustomPlayerSpawning : Plugin<Config>
 	{
 		private const string PlayerFixedPointFileName = "CustomPlayerSpawns";
-		private static Version CurrentVersion = new Version(3, 0);
+		private static Version CurrentVersion = new Version(3, 0, 1);
 
 		public static Config Configs;
 		public static readonly int RoleTypeSize = Enum.GetNames(typeof(RoleType)).Length;
@@ -46,7 +46,7 @@ namespace ArithFeather.CustomPlayerSpawning
 
 			_harmony.PatchAll();
 
-			Points.OnLoadSpawnPoints += OrganizeSpawns;
+			Points.Points.OnLoadSpawnPoints += OrganizeSpawns;
 			ServerEvents.ReloadedConfigs += ReloadConfig;
 			ServerEvents.RespawningTeam += Spawner.ServerEvents_RespawningTeam;
 			GetRandomSpawnPointPatch.OnGetRandomSpawnPoint += Spawner.GetRandomSpawnPointPatch_OnGetRandomSpawnPoint;
@@ -57,7 +57,7 @@ namespace ArithFeather.CustomPlayerSpawning
 
 		public override void OnDisabled()
 		{
-			Points.OnLoadSpawnPoints -= OrganizeSpawns;
+			Points.Points.OnLoadSpawnPoints -= OrganizeSpawns;
 			ServerEvents.ReloadedConfigs -= ReloadConfig;
 			ServerEvents.RespawningTeam -= Spawner.ServerEvents_RespawningTeam;
 			GetRandomSpawnPointPatch.OnGetRandomSpawnPoint -= Spawner.GetRandomSpawnPointPatch_OnGetRandomSpawnPoint;
@@ -68,7 +68,7 @@ namespace ArithFeather.CustomPlayerSpawning
 
 		private void ReloadConfig()
 		{
-			_pointList = Points.GetPointList(PlayerFixedPointFileName);
+			_pointList = Points.Points.GetPointList(PlayerFixedPointFileName);
 			_spawnFileExists = FileManager.FileExists(PointDataFilePath);
 		}
 
@@ -159,6 +159,7 @@ namespace ArithFeather.CustomPlayerSpawning
 			return spawnSettings;
 		}
 
+		//SpawnpointManager
 		private void CreateDefaultSpawnPointFile()
 		{
 			Log.Warn("Creating default CustomPlayerSpawns file.");
@@ -186,33 +187,17 @@ namespace ArithFeather.CustomPlayerSpawning
 						case RoleType.Scientist: return GameObject.FindGameObjectsWithTag("SP_RSC");
 						case RoleType.ClassD: return GameObject.FindGameObjectsWithTag("SP_CDP");
 						case RoleType.Tutorial: return new[] {GameObject.Find("TUT Spawn")};
-						default: return null;
+						default: return new GameObject[0];
 					}
 				}
 
-				if (spawns == null) continue;
-
 				var spawnCount = spawns.Length;
-
 				for (int j = 0; j < spawnCount; j++)
 				{
 					var spawnPoint = spawns[j];
-
-					var secter = spawnPoint.GetComponentInParent<SECTR_Sector>();
-
-					// if no secter found, return surface.
-					var room = secter == null
-						? Map.Rooms[Map.Rooms.Count - 1]
-						: Map.Rooms.First(x => x.Transform.gameObject == secter.gameObject);
-
-					if (room == null)
-					{
-						Log.Error($"Could not find room for {roleType}");
-						continue;
-					}
-
+					var room = Map.FindParentRoom(spawnPoint);
 					var spawnTransform = spawnPoint.transform;
-					var roomTransform = room.Transform;
+					var roomTransform = room.transform;
 					var position = roomTransform.InverseTransformPoint(spawnTransform.position);
 					var rotation = roomTransform.InverseTransformDirection(spawnTransform.eulerAngles);
 					_pointList.RawPoints.Add(new RawPoint(i.ToString(), room.Type, position, rotation));
@@ -222,21 +207,6 @@ namespace ArithFeather.CustomPlayerSpawning
 			PointIO.Save(_pointList, PointDataFilePath);
 			_pointList.FixData();
 			_spawnFileExists = true;
-		}
-
-		/// <summary>
-		/// Shuffle a list using Unity.
-		/// </summary>
-		public static void UnityShuffle<T>(IList<T> list)
-		{
-			for (var i = list.Count - 1; i > 1; i--)
-			{
-				var rnd = UnityEngine.Random.Range(0, i + 1);
-
-				var value = list[rnd];
-				list[rnd] = list[i];
-				list[i] = value;
-			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ArithFeather.Points.Tools;
 using Respawning;
 using Random = UnityEngine.Random;
 
@@ -83,7 +84,7 @@ namespace ArithFeather.CustomPlayerSpawning
 			_filteredSpawns = DistanceInfo.TryGetValue(role, out var roleDistances) ?
 				CachedDistances.CalculateSpawns(spawns, roleDistances, numberOfPoints) : spawns.ToList();
 
-			CustomPlayerSpawning.UnityShuffle(_filteredSpawns);
+			_filteredSpawns.UnityShuffle();
 			_filteredSpawnIndex = 0;
 			_useFilteredSpawns = true;
 		}
