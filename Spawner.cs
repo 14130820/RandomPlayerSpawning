@@ -32,7 +32,7 @@ namespace ArithFeather.CustomPlayerSpawning
 			// Try to get a normal spawn
 			if (RoleGameObjectDictionary.TryGetValue(role, out var spawns) && spawns.Count != 0) return spawns[Random.Range(0, spawns.Count)];
 
-			return new PlayerSpawnPoint(null, null);
+			return null;
 		}
 
 		private static bool TryGetRandomFilteredSpawn(out PlayerSpawnPoint filteredSpawn)

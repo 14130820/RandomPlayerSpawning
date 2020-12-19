@@ -97,7 +97,11 @@
     <Reference Include="Smod2">
       <HintPath>..\Smod2\Smod2\bin\Debug\net472\Smod2.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine" HintPath="$(UNITY)\UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(UNITY)\UnityEngine.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule" HintPath="$(UNITY)\UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="UnityEngine.PhysicsModule" HintPath="$(UNITY)\UnityEngine.PhysicsModule.dll" Private="false" />
   </ItemGroup>

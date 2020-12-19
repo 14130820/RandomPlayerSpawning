@@ -14,7 +14,7 @@ namespace ArithFeather.CustomPlayerSpawning
 	public class CustomPlayerSpawning : Plugin<Config>
 	{
 		private const string PlayerFixedPointFileName = "CustomPlayerSpawns";
-		private static Version CurrentVersion = new Version(3, 0, 1);
+		private static Version CurrentVersion = new Version(3, 0, 2);
 
 		public static Config Configs;
 		public static readonly int RoleTypeSize = Enum.GetNames(typeof(RoleType)).Length;
