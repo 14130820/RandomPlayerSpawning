@@ -5,44 +5,23 @@ using ArithFeather.Points.Tools;
 using Exiled.API.Features;
 using UnityEngine;
 
-namespace ArithFeather.CustomPlayerSpawning {
-	internal static class CachedDistances {
-
-		private static readonly Dictionary<int, RoomWithPoints> CachedOccupiedRooms = new Dictionary<int, RoomWithPoints>();
-		private static readonly List<RoomWithPoints> CachedRoomPos = new List<RoomWithPoints>();
-		private static readonly List<DistanceToRoom> CachedSpawnDistances = new List<DistanceToRoom>();
+namespace ArithFeather.CustomPlayerSpawning
+{
+	internal static class CachedDistances
+	{
+		private static readonly List<DistanceToPoint> CachedSpawnDistances = new List<DistanceToPoint>();
 		private static readonly List<PlayerSpawnPoint> CachedFixedPoints = new List<PlayerSpawnPoint>();
 
 		/// <summary>
 		/// Will calculate the distance of the players to the spawn point's rooms.
 		/// </summary>
 		/// <returns>List of 'safe' spawn points.</returns>
-		public static List<PlayerSpawnPoint> CalculateSpawns(IReadOnlyList<PlayerSpawnPoint> pointsToCheck, Dictionary<RoleType, float> unsafeData, int pointsRequired = 1) {
-			CachedFixedPoints.Clear();
+		public static List<PlayerSpawnPoint> CalculateSpawns(IReadOnlyList<PlayerSpawnPoint> pointsToCheck, Dictionary<RoleType, float> unsafeData, int pointsRequired = 1)
+		{
 
-			if (pointsRequired < 1 || unsafeData.Count == 0 || pointsToCheck.Count < pointsRequired) return CachedFixedPoints;
+			if (pointsRequired < 1 || unsafeData.Count == 0 || pointsToCheck.Count < pointsRequired) return pointsToCheck.ToList();
 
-			CachedOccupiedRooms.Clear();
-			CachedRoomPos.Clear();
 			CachedSpawnDistances.Clear();
-
-			// Get unique rooms from points
-			var pointCount = pointsToCheck.Count;
-			for (int i = 0; i < pointCount; i++) {
-				var point = pointsToCheck[i];
-				var room = point.Room;
-				var id = room.GetInstanceID();
-
-				if (!CachedOccupiedRooms.TryGetValue(id, out var roomWithPoints)) {
-					roomWithPoints = new RoomWithPoints(room.transform.position);
-					roomWithPoints.Points.Add(point);
-
-					CachedOccupiedRooms.Add(id, roomWithPoints);
-					CachedRoomPos.Add(roomWithPoints);
-				}
-
-				roomWithPoints.Points.Add(point);
-			}
 
 			// Get players that have a distance modifier greater than 10 units.
 			var players = Player.List.ToList();
@@ -54,15 +33,15 @@ namespace ArithFeather.CustomPlayerSpawning {
 			}
 			playerCount = players.Count;
 
-			// For each room, find the room distance to the closest player.
-			var roomCount = CachedRoomPos.Count;
+			// For each point, find the closest player
+			var pointCount = pointsToCheck.Count;
 
-			for (int i = 0; i < roomCount; i++)
+			for (int i = 0; i < pointCount; i++)
 			{
-				var room = CachedRoomPos[i];
-				var roomPos = room.Position;
+				var point = pointsToCheck[i];
+				var pointPos = point.GameObject.transform.position;
 
-				float roomFreeDistance = 10000;
+				float pointFreeDistance = 10000;
 
 				for (int j = 0; j < playerCount; j++)
 				{
@@ -70,60 +49,49 @@ namespace ArithFeather.CustomPlayerSpawning {
 					var playerPos = player.Position;
 
 					// subtract the safe distance to get a float representing how much distance is left before the room is unsafe.
-					var freeDistance = (playerPos - roomPos).sqrMagnitude - unsafeData[player.Role];
-					if (freeDistance < roomFreeDistance) roomFreeDistance = freeDistance;
+					var freeDistance = (playerPos - pointPos).sqrMagnitude - unsafeData[player.Role];
+					if (freeDistance < pointFreeDistance) pointFreeDistance = freeDistance;
 				}
 
-				CachedSpawnDistances.Add(new DistanceToRoom(roomFreeDistance, room.Points));
+				CachedSpawnDistances.Add(new DistanceToPoint(pointFreeDistance, point));
 			}
 
-			if (CachedSpawnDistances.Count == 0) return CachedFixedPoints;
+			if (CachedSpawnDistances.Count == 0) return pointsToCheck.ToList();
 
 			// Make sure we have enough points
 			var distanceToRoomSize = CachedSpawnDistances.Count;
-			var distanceModifier = 0;
+			var distanceModifier = -10;
 			bool enoughPoints;
 
-			do {
+			do
+			{
+				distanceModifier += 10;
 				CachedFixedPoints.Clear();
 
-				for (int i = 0; i < distanceToRoomSize; i++) {
+				for (int i = 0; i < distanceToRoomSize; i++)
+				{
 					var dtr = CachedSpawnDistances[i];
 
 					if (dtr.FreeDistance + distanceModifier >= 0)
-						CachedFixedPoints.AddRange(dtr.Points);
+						CachedFixedPoints.Add(dtr.Point);
 				}
 
 				enoughPoints = CachedFixedPoints.Count >= pointsRequired;
-
-				if (!enoughPoints) {
-					distanceModifier += 10;
-				}
 
 			} while (!enoughPoints);
 
 			return CachedFixedPoints;
 		}
 
-		private readonly struct RoomWithPoints {
-			public readonly Vector3 Position;
-
-			public RoomWithPoints(Vector3 position) {
-				Position = position;
-				Points = new List<PlayerSpawnPoint>();
-			}
-
-			public readonly List<PlayerSpawnPoint> Points;
-		}
-
-		private readonly struct DistanceToRoom {
-			public readonly List<PlayerSpawnPoint> Points;
+		private readonly struct DistanceToPoint
+		{
+			public readonly PlayerSpawnPoint Point;
 			public readonly float FreeDistance;
 
-			public DistanceToRoom(float freeDistance, List<PlayerSpawnPoint> points)
+			public DistanceToPoint(float freeDistance, PlayerSpawnPoint point)
 			{
 				FreeDistance = freeDistance;
-				Points = points;
+				Point = point;
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using ArithFeather.CustomPlayerSpawning.Patches;
 using ArithFeather.Points.DataTypes;
 using ArithFeather.Points.Tools;
 using Exiled.API.Enums;
@@ -14,7 +15,6 @@ namespace ArithFeather.CustomPlayerSpawning
 	public class CustomPlayerSpawning : Plugin<Config>
 	{
 		private const string PlayerFixedPointFileName = "CustomPlayerSpawns";
-		private static Version CurrentVersion = new Version(3, 0, 2);
 
 		public static Config Configs;
 		public static readonly int RoleTypeSize = Enum.GetNames(typeof(RoleType)).Length;
@@ -32,7 +32,8 @@ namespace ArithFeather.CustomPlayerSpawning
 		public static SpawnSettings SpawnSettings { get; set; }
 
 		public override string Author => "Arith";
-		public override Version Version => CurrentVersion;
+		public override Version Version => new Version(3, 0, 3);
+		public override Version RequiredExiledVersion => new Version(2, 1, 3);
 
 		public override PluginPriority Priority =>
 			PluginPriority.Lowest; // Make sure this team spawn event is tested last
@@ -42,7 +43,6 @@ namespace ArithFeather.CustomPlayerSpawning
 		public override void OnEnabled()
 		{
 			Configs = Config;
-			base.OnEnabled();
 
 			_harmony.PatchAll();
 
@@ -53,6 +53,8 @@ namespace ArithFeather.CustomPlayerSpawning
 			EndOfTeamSpawnPatch.OnEndTeamRespawn += Spawner.EndTeamRespawn;
 
 			ReloadConfig();
+
+			base.OnEnabled();
 		}
 
 		public override void OnDisabled()
@@ -75,7 +77,7 @@ namespace ArithFeather.CustomPlayerSpawning
 		private void OrganizeSpawns()
 		{
 			if (!_spawnFileExists) CreateDefaultSpawnPointFile();
-			if (SpawnSettings == null) SpawnSettings = GetDefaultSpawnSettings();
+			if (SpawnSettings == null) SpawnSettings = SpawnSettings.GetDefaultSpawnSettings();
 
 			RoleGameObjectDictionary.Clear();
 
@@ -126,40 +128,6 @@ namespace ArithFeather.CustomPlayerSpawning
 			}
 		}
 
-		private SpawnSettings GetDefaultSpawnSettings()
-		{
-			var spawnSettings = new SpawnSettings();
-			spawnSettings.DefineSharedSpawns(RoleType.Scp93953, RoleType.Scp93989);
-			spawnSettings.DefineSharedSpawns(RoleType.NtfScientist, RoleType.NtfCadet, RoleType.NtfCommander,
-				RoleType.NtfLieutenant);
-
-			if (Config.UseDefaultSafeSpawns)
-			{
-				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
-					new[] {RoleType.ChaosInsurgency, RoleType.ClassD},
-					Config.DefaultSafeSpawnDistance, Config.DefaultEnemySafeSpawnDistance));
-
-				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
-					new[]
-					{
-						RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant, RoleType.NtfScientist,
-						RoleType.Scientist, RoleType.FacilityGuard
-					},
-					Config.DefaultSafeSpawnDistance, Config.DefaultEnemySafeSpawnDistance));
-
-				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
-					new[]
-					{
-						RoleType.Scp93953, RoleType.Scp049, RoleType.Scp096, RoleType.Scp106, RoleType.Scp93989,
-						RoleType.Scp173
-					},
-					Config.DefaultSafeSpawnDistance, Config.DefaultEnemySafeSpawnDistance));
-			}
-
-			return spawnSettings;
-		}
-
-		//SpawnpointManager
 		private void CreateDefaultSpawnPointFile()
 		{
 			Log.Warn("Creating default CustomPlayerSpawns file.");

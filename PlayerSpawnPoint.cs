@@ -5,8 +5,8 @@ namespace ArithFeather.CustomPlayerSpawning
 {
 	public class PlayerSpawnPoint
 	{
-		public readonly GameObject GameObject;
-		public readonly Room Room;
+		public GameObject GameObject;
+		public Room Room;
 
 		public PlayerSpawnPoint(GameObject gameObject, Room room)
 		{

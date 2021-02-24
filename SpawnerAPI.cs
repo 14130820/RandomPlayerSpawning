@@ -1,10 +1,12 @@
-﻿namespace ArithFeather.CustomPlayerSpawning
+﻿using ArithFeather.CustomPlayerSpawning.Patches;
+
+namespace ArithFeather.CustomPlayerSpawning
 {
 	public static class SpawnerAPI
 	{
 		static SpawnerAPI()
 		{
-			GetRandomSpawnPointPatch.OnPlayerSpawningAtPoint += (a) => OnPlayerSpawningAtPoint?.Invoke(a);
+			GetRandomSpawnPointPatch.OnPlayerSpawningAtPoint += (a, b) => OnPlayerSpawningAtPoint?.Invoke(a,b);
 		}
 
 		/// <summary>
@@ -28,11 +30,17 @@
 		/// </summary>
 		public static void EndSpawning() => Spawner.EndTeamRespawn();
 
-		public delegate void PlayerSpawningAtPoint(PlayerSpawnPoint playerSpawnPoint);
+		public delegate void PlayerSpawningAtPoint(PlayerSpawnPoint playerSpawnPoint, RoleType role);
 
 		/// <summary>
 		/// Invokes right before the player spawns, giving you the spawn point information.
 		/// </summary>
 		public static event PlayerSpawningAtPoint OnPlayerSpawningAtPoint;
+
+		/// <summary>
+		/// This will attempt to get a random spawn point.
+		/// </summary>
+		public static PlayerSpawnPoint GetRandomSpawnPoint(RoleType role) =>
+			Spawner.GetRandomSpawnPointPatch_OnGetRandomSpawnPoint(role);
 	}
 }

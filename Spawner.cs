@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ArithFeather.Points.Tools;
+using Dissonance;
 using Respawning;
+using UnityEngine;
+using Log = Exiled.API.Features.Log;
 using Random = UnityEngine.Random;
 
 namespace ArithFeather.CustomPlayerSpawning
@@ -20,14 +23,10 @@ namespace ArithFeather.CustomPlayerSpawning
 
 		public static void EndTeamRespawn() => _useFilteredSpawns = false;
 
-		public static PlayerSpawnPoint GetRandomSpawnPointPatch_OnGetRandomSpawnPoint(RoleType role)
+		internal static PlayerSpawnPoint GetRandomSpawnPointPatch_OnGetRandomSpawnPoint(RoleType role)
 		{
 			// Try to get a filtered spawn
-			if (_useFilteredSpawns)
-			{
-				_useFilteredSpawns = false;
-				if (TryGetRandomFilteredSpawn(out var spawn)) return spawn;
-			}
+			if (_useFilteredSpawns && TryGetRandomFilteredSpawn(out var spawn)) return spawn;
 
 			// Try to get a normal spawn
 			if (RoleGameObjectDictionary.TryGetValue(role, out var spawns) && spawns.Count != 0) return spawns[Random.Range(0, spawns.Count)];
@@ -35,7 +34,7 @@ namespace ArithFeather.CustomPlayerSpawning
 			return null;
 		}
 
-		private static bool TryGetRandomFilteredSpawn(out PlayerSpawnPoint filteredSpawn)
+		public static bool TryGetRandomFilteredSpawn(out PlayerSpawnPoint filteredSpawn)
 		{
 			var filteredSpawnsCount = _filteredSpawns.Count;
 
@@ -74,15 +73,18 @@ namespace ArithFeather.CustomPlayerSpawning
 		/// <param name="numberOfPoints"></param>
 		public static void FilterSpawns(RoleType role, int numberOfPoints = 1)
 		{
+			Log.Error($"Filtering spawns for [{role}]");
 			// Get spawns for role
 			var spawns = RoleGameObjectDictionary[role];
 			var spawnCount = spawns.Count;
 
-			if (spawnCount == 0) return;
+			if (spawnCount != 0 && DistanceInfo.TryGetValue(role, out var roleDistances))
+			{
+				_filteredSpawns = CachedDistances.CalculateSpawns(spawns, roleDistances, numberOfPoints);
+			}
+			else return;
 
-			// Filter spawns based on distances
-			_filteredSpawns = DistanceInfo.TryGetValue(role, out var roleDistances) ?
-				CachedDistances.CalculateSpawns(spawns, roleDistances, numberOfPoints) : spawns.ToList();
+			Log.Error($"Pruned free spawn list from {spawnCount} to {_filteredSpawns.Count}");
 
 			_filteredSpawns.UnityShuffle();
 			_filteredSpawnIndex = 0;

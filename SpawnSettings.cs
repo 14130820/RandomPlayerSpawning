@@ -56,5 +56,43 @@ namespace ArithFeather.CustomPlayerSpawning
 				}
 			}
 		}
+
+		/// <summary>
+		/// Gets the default spawn settings file. This is closest to base game.
+		/// </summary>
+		public static SpawnSettings GetDefaultSpawnSettings()
+		{
+			var spawnSettings = new SpawnSettings();
+			spawnSettings.DefineSharedSpawns(RoleType.Scp93953, RoleType.Scp93989);
+			spawnSettings.DefineSharedSpawns(RoleType.NtfScientist, RoleType.NtfCadet, RoleType.NtfCommander,
+				RoleType.NtfLieutenant);
+
+			var configs = CustomPlayerSpawning.Configs;
+
+			if (configs.UseDefaultSafeSpawns)
+			{
+				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
+					new[] { RoleType.ChaosInsurgency, RoleType.ClassD },
+					configs.DefaultSafeSpawnDistance, configs.DefaultEnemySafeSpawnDistance));
+
+				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
+					new[]
+					{
+						RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant, RoleType.NtfScientist,
+						RoleType.Scientist, RoleType.FacilityGuard
+					},
+					configs.DefaultSafeSpawnDistance, configs.DefaultEnemySafeSpawnDistance));
+
+				spawnSettings.DefineSafeSpawnDistances(new DistanceCheckInfo(
+					new[]
+					{
+						RoleType.Scp93953, RoleType.Scp049, RoleType.Scp096, RoleType.Scp106, RoleType.Scp93989,
+						RoleType.Scp173
+					},
+					configs.DefaultSafeSpawnDistance, configs.DefaultEnemySafeSpawnDistance));
+			}
+
+			return spawnSettings;
+		}
 	}
 }

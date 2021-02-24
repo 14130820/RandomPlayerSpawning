@@ -2,7 +2,7 @@
 using HarmonyLib;
 using UnityEngine;
 
-namespace ArithFeather.CustomPlayerSpawning
+namespace ArithFeather.CustomPlayerSpawning.Patches
 {
 	[HarmonyPatch(typeof(SpawnpointManager), "GetRandomPosition")]
 	internal static class GetRandomSpawnPointPatch
@@ -24,7 +24,7 @@ namespace ArithFeather.CustomPlayerSpawning
 				return true;
 			}
 
-			OnPlayerSpawningAtPoint?.Invoke(spawnPoint);
+			OnPlayerSpawningAtPoint?.Invoke(spawnPoint, classID);
 
 			__result = spawnPoint?.GameObject;
 			return __result == null;
